@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="google-site-verification" content="TZE0rZyIqLl10trYu3BWBWa1Vmz6HFwhb2OcNEK4u-s" />
+     <link rel="shortcut icon" href= /img/favicon.ico >
+    <title>
+        wxd&#39;s blog
+    </title>
+    <meta name="description" content= 嘿，我是wxd,这是我的网站。欢迎访问！ >
+    <meta name="keywords" content= Blog,Hexo,王晓东,Wxd >
+    
+<link rel="stylesheet" href="/libs/highlight/styles/monokai-sublime.css">
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+<body id="bodyx">
+    <div class="hd posts">
+    <a href="/index.html"><i class="fa fa-home
+ replay-btn" aria-hidden="true"></i></a>
+    <div class="post-title">
+        <p>
+            把「终端下的 Vim」作为 macOS Finder 的打开方式
+        </p>
+        <hr>
+    </div>
+    <div class="post-content">
+        <p>我的日常主力编辑器主要是：</p>
+<ul>
+<li>(Neo)Vim</li>
+<li>Spacemacs (via Emacs-plus)</li>
+<li>Visual Studio Code</li>
+<li>IntelliJ IDEA</li>
+</ul>
+<p>这里面只有 (Neo)Vim 是存活在终端中的（我并不在终端内使用 Emacs），而由于我日常主要是从终端（via iTerm）来使用电脑，所以会把他们都加入到 <code>$PATH</code> 里以方便从终端中唤起，VSCode 和 IDEA 都有一键加入的功能， Emacs 我在 <code>~/.zshrc</code> 中放了一个 <code>alias emacs=&#39;open -n -a Emacs.app .&#39;</code> 解决。</p>
+<p>但是，偶尔也会有从 Finder 中打开文件的需求，这时候如果通常会打开拓展名所绑定的 <code>Open with...</code> 应用，在大部分时候我的默认绑定是 VSCode，但是今天心血来潮觉得有没有办法直接打开 Vim 呢？搜了一下还真有基于 AppleScript 的解决方案：</p>
+<ol>
+<li>打开 <code>Automator.app</code></li>
+<li>选择 <code>New Document</code></li>
+<li>找到 <code>Run AppleScript</code> 的 action 双击添加</li>
+<li>编写 AppleScript 脚本来唤起终端与 vim （下文给出了我的脚本你可以直接稍作修改使用）</li>
+<li>保存为 <code>Applications/iTermVim.app</code> （你可以自己随便取）</li>
+<li>找到你想要以这种方式打开的文件，比如 <code>&lt;随便&gt;.markdown</code>，<code>⌘ i</code> 获取信息然后修改 <code>Open with</code> 为这个应用然后 <code>Change All...</code></li>
+</ol>
+<p>效果超爽 ;)</p>
+<a id="more"></a>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">on run &#123;input, parameters&#125;</span><br><span class="line">  set filename to POSIX path <span class="keyword">of</span> input</span><br><span class="line">  set cmd to <span class="string">&quot;clear; cd `dirname &quot;</span> &amp; filename &amp; <span class="string">&quot;`;vim &quot;</span> &amp; quote &amp; filename &amp; quote</span><br><span class="line">  tell application <span class="string">&quot;iTerm&quot;</span></span><br><span class="line">    activate</span><br><span class="line">    tell the current <span class="built_in">window</span></span><br><span class="line">      create tab <span class="keyword">with</span> <span class="keyword">default</span> profile</span><br><span class="line">      tell the current session</span><br><span class="line">        write text cmd</span><br><span class="line">      end tell</span><br><span class="line">    end tell</span><br><span class="line">  end tell</span><br><span class="line">end run</span><br></pre></td></tr></table></figure>
+<p>我这里的代码是采取是用 <code>iTerm</code> 与唤起 <code>vim</code>、窗口置前、在新窗口中打开、同时 <code>cd</code> 到目录。你也可以改成用 macOS 自带的 <code>Terminal.app</code>、在新窗口而非新 tab 打开、应用不同的 profile、或是执行其他 executable 等……任你发挥啦。</p>
+<h3 id="References"><a href="#References" class="headerlink" title="References"></a>References</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://gist.github.com/charlietran/43639b0f4e0a01c7c20df8f1929b76f2">Open file in iTerm vim for MacOS Sierra</a></li>
+<li><a target="_blank" rel="noopener" href="https://bl.ocks.org/napcs/2d8376e941133ccfad63e33bf1b1b60c">Open file in Terminal Vim on OSX</a></li>
+</ul>
+
+    </div>
+
+    
+        <hr class="fhr">
+        <div id="vcomments"></div>
+    
+</div>
+    <div class="footer" id="footer">
+    <p><h4>Copyright © 2020 | Author: wxd | Theme By <a class="theme-author" target="_blank" rel="noopener" href="https://github.com/Xunzhuo/hexo-theme-coder" style="font-size:14px; color: #969696">Coder</a></h4>
+    <label class="el-switch el-switch-blue el-switch-sm" style="vertical-align: sub;">
+        <input type="checkbox" name="switch" id="update_style">
+        <span class="el-switch-style"></span>
+    </label>
+    <!--         <script type="text/javascript">
+    var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");
+    document.write(unescape("%3Cspan id='cnzz_stat_icon_1278548644'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "v1.cnzz.com/stat.php%3Fid%3D1278548644%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+    </script> -->
+</p>
+</div>
+<input type="hidden" id="web_style" value="light">
+<input type="hidden" id="valine_appid" value="Im27nC8j3W00QUx6vlxIpOzs-gzGzoHsz">
+<input type="hidden" id="valine_appKey" value="SDix7lgxAXxW9D3FEWFpgkCu">
+
+<script src="/libs/jquery.min.js"></script>
+
+
+<script src="/libs/highlight/highlight.pack.js"></script>
+
+<script src='//cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js'></script>
+
+<script src="/js/js.js"></script>
+
+<style type="text/css">
+.v * {
+color: #698fca;
+}
+.v .vlist .vcard .vhead .vsys {
+color: #3a3e4a;
+}
+.v .vlist .vcard .vh .vmeta .vat {
+color: #638fd5;
+}
+.v .vlist .vcard .vhead .vnick {
+color: #6ba1ff;
+}
+.v a {
+color: #8696b1;
+}
+.v .vlist .vcard .vhead .vnick:hover {
+color: #669bfc;
+}
+</style>
+    <script type="text/javascript" color="173,174,173" opacity='1' zIndex="-2" count="99" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+</body>
+</html>
